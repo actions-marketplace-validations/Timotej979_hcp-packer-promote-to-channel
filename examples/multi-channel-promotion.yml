@@ -1,0 +1,72 @@
+name: Multi-Channel Promotion
+
+on:
+  workflow_dispatch:
+    inputs:
+      iteration_id:
+        description: 'HCP Packer iteration ID to promote'
+        required: true
+      promote_to_production:
+        description: 'Promote to production channel'
+        type: boolean
+        default: false
+
+jobs:
+  promote-staging:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Setup HCP credential file
+        run: |
+          mkdir -p ~/.config/hcp
+          echo '${{ secrets.HCP_CRED_FILE }}' > ~/.config/hcp/credentials.json
+      
+      - name: Promote to Staging
+        id: promote-staging
+        uses: Timotej979/hcp-packer-promote-to-channel-action@v0.1
+        with:
+          hcp_cred_file: ~/.config/hcp/credentials.json
+          hcp_cli_version: 'latest'
+          iteration_id: ${{ inputs.iteration_id }}
+          channel: 'staging'
+          bucket_name: 'my-bucket'
+      
+      - name: Verify Staging Promotion
+        if: steps.promote-staging.outputs.success == 'true'
+        run: |
+          echo "✅ Successfully promoted to staging channel"
+          echo "Iteration: ${{ steps.promote-staging.outputs.iteration_id }}"
+          echo "Channel: ${{ steps.promote-staging.outputs.channel_name }}"
+
+  promote-production:
+    if: inputs.promote_to_production == true
+    needs: promote-staging
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Setup HCP credential file
+        run: |
+          mkdir -p ~/.config/hcp
+          echo '${{ secrets.HCP_CRED_FILE }}' > ~/.config/hcp/credentials.json
+      
+      - name: Promote to Production
+        id: promote-production
+        uses: Timotej979/hcp-packer-promote-to-channel-action@v0.1
+        with:
+          hcp_cred_file: ~/.config/hcp/credentials.json
+          hcp_cli_version: 'latest'
+          iteration_id: ${{ inputs.iteration_id }}
+          channel: 'production'
+          bucket_name: 'my-bucket'
+      
+      - name: Verify Production Promotion
+        if: steps.promote-production.outputs.success == 'true'
+        run: |
+          echo "✅ Successfully promoted to production channel"
+          echo "Iteration: ${{ steps.promote-production.outputs.iteration_id }}"
+          echo "Channel: ${{ steps.promote-production.outputs.channel_name }}"
+

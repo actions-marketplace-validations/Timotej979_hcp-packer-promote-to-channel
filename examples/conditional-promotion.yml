@@ -1,0 +1,54 @@
+name: Conditional Channel Promotion
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+      - production
+
+jobs:
+  determine-channel:
+    runs-on: ubuntu-latest
+    outputs:
+      channel: ${{ steps.set-channel.outputs.channel }}
+    steps:
+      - name: Determine target channel
+        id: set-channel
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "channel=staging" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" == "refs/heads/staging" ]; then
+            echo "channel=staging" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" == "refs/heads/production" ]; then
+            echo "channel=production" >> $GITHUB_OUTPUT
+          fi
+
+  promote:
+    needs: determine-channel
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Setup HCP credential file
+        run: |
+          mkdir -p ~/.config/hcp
+          echo '${{ secrets.HCP_CRED_FILE }}' > ~/.config/hcp/credentials.json
+      
+      - name: Get Iteration ID from Commit
+        id: get-iteration
+        run: |
+          # Extract iteration ID from commit message or use commit SHA
+          ITERATION_ID="${GITHUB_SHA:0:12}"
+          echo "iteration_id=$ITERATION_ID" >> $GITHUB_OUTPUT
+      
+      - name: Promote to ${{ needs.determine-channel.outputs.channel }}
+        uses: Timotej979/hcp-packer-promote-to-channel-action@v0.1
+        with:
+          hcp_cred_file: ~/.config/hcp/credentials.json
+          hcp_cli_version: 'latest'
+          iteration_id: ${{ steps.get-iteration.outputs.iteration_id }}
+          channel: ${{ needs.determine-channel.outputs.channel }}
+          bucket_name: 'my-bucket'
+

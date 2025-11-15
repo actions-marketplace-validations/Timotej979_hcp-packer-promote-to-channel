@@ -1,10 +1,71 @@
 # HCP Packer Promote to Channel Action
 
+[![GitHub release](https://img.shields.io/github/v/release/Timotej979/hcp-packer-promote-to-channel-action?style=flat-square)](https://github.com/Timotej979/hcp-packer-promote-to-channel-action/releases)
+[![GitHub Marketplace](https://img.shields.io/badge/Marketplace-Action-blue?logo=github&style=flat-square)](https://github.com/marketplace/actions/hcp-packer-promote-to-channel-action)
+[![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
+[![HashiCorp](https://img.shields.io/badge/HashiCorp-Packer-FF7D47?logo=hashicorp&style=flat-square)](https://www.hashicorp.com/products/packer)
+
 🚀 GitHub Action to promote HCP Packer image iterations to distribution channels using OIDC workload identity federation | 🔐 Secure authentication without storing credentials | 📦 Perfect for golden image pipelines
 
 ## Overview
 
 This GitHub Action automates the promotion of HCP Packer image iterations to distribution channels. It uses OIDC workload identity federation to securely authenticate with HCP without requiring long-lived credentials. The action fetches the HCP JWT token for authentication using OIDC through Workload Identity Federation/Provider schema and promotes the iteration of your Packer image through the iteration ID.
+
+## How It Works
+
+The following diagram illustrates the authentication and promotion flow:
+
+```mermaid
+sequenceDiagram
+    participant GH as GitHub Actions
+    participant Action as Promote Action
+    participant WIP as Workload Identity Provider
+    participant HCP as HCP Packer API
+    participant CLI as HCP CLI
+
+    GH->>Action: Trigger workflow with iteration_id
+    Action->>Action: Read HCP credential file
+    Action->>GH: Request OIDC token (audience: auth.hashicorp.com)
+    GH-->>Action: GitHub OIDC Token
+    
+    Action->>WIP: Exchange OIDC token for HCP token
+    Note over Action,WIP: Token Exchange Request<br/>(OAuth 2.0 Token Exchange)
+    WIP-->>Action: HCP Access Token
+    
+    Action->>CLI: Install HCP CLI
+    Action->>CLI: Authenticate with credential file
+    CLI-->>Action: HCP CLI authenticated
+    
+    Action->>CLI: Fetch Organization ID
+    CLI-->>Action: Organization ID
+    Action->>CLI: Fetch Project ID
+    CLI-->>Action: Project ID
+    
+    Action->>HCP: PATCH /channels/{channel}
+    Note over Action,HCP: Promote iteration to channel<br/>Authorization: Bearer {HCP Token}
+    HCP-->>Action: Success (200/204)
+    
+    Action->>GH: Set outputs (success, channel_name, iteration_id)
+    Action-->>GH: Action completed
+```
+
+### Authentication Flow
+
+```mermaid
+graph LR
+    A[GitHub Actions] -->|1. Request OIDC Token| B[GitHub OIDC Provider]
+    B -->|2. OIDC Token| A
+    A -->|3. Exchange Token| C[Workload Identity Provider]
+    C -->|4. HCP Access Token| A
+    A -->|5. Authenticate| D[HCP Packer API]
+    D -->|6. Promote Iteration| E[HCP Channel]
+    
+    style A fill:#2088FF
+    style B fill:#2088FF
+    style C fill:#FF7D47
+    style D fill:#FF7D47
+    style E fill:#FF7D47
+```
 
 ## Features
 
@@ -158,6 +219,8 @@ permissions:
 ```
 
 ## Examples
+
+> 💡 **More Examples**: Check out the [examples directory](examples/) for additional workflow patterns including multi-channel promotion, conditional promotion, and complete build-and-promote pipelines.
 
 ### Promote After Successful Build
 

@@ -1,0 +1,33 @@
+name: Basic Channel Promotion
+
+on:
+  workflow_dispatch:
+    inputs:
+      iteration_id:
+        description: 'HCP Packer iteration ID to promote'
+        required: true
+      channel:
+        description: 'Channel name to promote to'
+        required: true
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Setup HCP credential file
+        run: |
+          mkdir -p ~/.config/hcp
+          echo '${{ secrets.HCP_CRED_FILE }}' > ~/.config/hcp/credentials.json
+      
+      - name: Promote iteration to channel
+        uses: Timotej979/hcp-packer-promote-to-channel-action@v0.1
+        with:
+          hcp_cred_file: ~/.config/hcp/credentials.json
+          hcp_cli_version: 'latest'
+          iteration_id: ${{ inputs.iteration_id }}
+          channel: ${{ inputs.channel }}
+          bucket_name: 'my-bucket'
+
