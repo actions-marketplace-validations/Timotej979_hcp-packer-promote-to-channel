@@ -355,6 +355,18 @@ jobs:
 
 - **Packer Build Authentication**: If you're having issues building Packer images (not promoting) with WIF/WIP, refer to [hashicorp/packer#13454](https://github.com/hashicorp/packer/issues/13454) for details on the known issue with Packer builds requiring static credentials even when using workload identity federation.
 
+## References
+
+The following resources were instrumental in developing this action and provide valuable context for understanding HCP Packer channel promotion and the HCP Packer API:
+
+- **[Golden Image Pipelines With HCP Packer](https://devdosvid.blog/2022/06/26/golden-image-pipelines-with-hcp-packer/)** - Comprehensive guide explaining HCP Packer concepts, including image buckets, iterations, channels, and the PATCH API method for channel promotion. This blog post provided the foundation for implementing the channel promotion API call used in this action.
+
+- **[HCP Packer Documentation](https://developer.hashicorp.com/packer/docs/hcp)** - Official HashiCorp documentation for HCP Packer, covering registry concepts, API endpoints, and integration patterns. Essential reference for understanding the HCP Packer architecture and available operations.
+
+- **[GitHub Actions OIDC Documentation](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect)** - Official guide on using OpenID Connect (OIDC) for secure authentication in GitHub Actions workflows. This documentation explains how to configure workload identity federation, which this action uses for secure authentication without storing long-lived credentials.
+
+- **[Packer WIF/WIP Issue](https://github.com/hashicorp/packer/issues/13454)** - Closed GitHub issue I opened discussing known limitations with Packer builds using workload identity federation/workload identity provider (WIF/WIP) authentication. This action specifically handles channel promotion (not image building) and works correctly with WIF/WIP, addressing a gap in the Packer ecosystem.
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request or open an issue on GitHub.
