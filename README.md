@@ -1,9 +1,9 @@
 # HCP Packer Promote to Channel Action
 
-[![GitHub release](https://img.shields.io/github/v/release/Timotej979/hcp-packer-promote-to-channel-action?style=flat-square)](https://github.com/Timotej979/hcp-packer-promote-to-channel-action/releases)
-[![GitHub Marketplace](https://img.shields.io/badge/Marketplace-Action-blue?logo=github&style=flat-square)](https://github.com/marketplace/actions/hcp-packer-promote-to-channel-action)
-[![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
-[![HashiCorp](https://img.shields.io/badge/HashiCorp-Packer-FF7D47?logo=hashicorp&style=flat-square)](https://www.hashicorp.com/products/packer)
+[![GitHub release](https://img.shields.io/github/v/release/Timotej979/hcp-packer-promote-to-channel?style=plastic)](https://github.com/Timotej979/hcp-packer-promote-to-channel/releases)
+[![GitHub Marketplace](https://img.shields.io/badge/Marketplace-Action-blue?logo=github&style=plastic)](https://github.com/marketplace/actions/hcp-packer-promote-to-channel)
+[![License](https://img.shields.io/badge/license-MIT-green?style=plastic)](LICENSE)
+[![HashiCorp](https://img.shields.io/badge/HashiCorp-Packer-FF7D47?logo=hashicorp&style=plastic)](https://www.hashicorp.com/products/packer)
 
 🚀 GitHub Action to promote HCP Packer image iterations to distribution channels using OIDC workload identity federation | 🔐 Secure authentication without storing credentials | 📦 Perfect for golden image pipelines
 
