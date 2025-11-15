@@ -1,0 +1,33 @@
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# Temporary files
+*.tmp
+*.log
+*.bak
+*.cache
+
+# Secrets (if any)
+*.pem
+*.key
+*.env
+.env.local
+secrets/
+
